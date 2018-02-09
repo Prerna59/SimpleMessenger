@@ -1,7 +1,11 @@
 package edu.buffalo.cse.cse486586.simplemessenger;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -156,6 +160,32 @@ public class SimpleMessengerActivity extends Activity {
              * TODO: Fill in your server code that receives messages and passes them
              * to onProgressUpdate().
              */
+
+
+            try {
+              while(true){
+                //Need to create a socket to accept the connection from client
+
+                  Socket clientSocket = serverSocket.accept();
+                  InputStream is = clientSocket.getInputStream();
+                  BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+                  PrintStream ps = new PrintStream(clientSocket.getOutputStream());
+                  String clientMsg=null;
+                  while((clientMsg = br.readLine())!=null){
+                    ps.print(clientMsg);
+                    publishProgress(clientMsg);
+                  }
+
+              }
+
+            }
+            catch (IOException e) {
+              //  e.printStackTrace();
+                Log.e(TAG, "ServerTask socket IOException");
+            }
+
+
             return null;
         }
 
@@ -216,6 +246,9 @@ public class SimpleMessengerActivity extends Activity {
                 /*
                  * TODO: Fill in your client code that sends out a message.
                  */
+
+                PrintStream ps = new PrintStream(socket.getOutputStream());
+                ps.print(msgToSend);
                 socket.close();
             } catch (UnknownHostException e) {
                 Log.e(TAG, "ClientTask UnknownHostException");
